@@ -5,7 +5,7 @@ const path = require('path');
 
 // Initialize S3Client for DigitalOcean Spaces
 const s3 = new S3Client({
-    endpoint: 'https://frank-space.fra1.digitaloceanspaces.com', // DigitalOcean region endpoint
+    endpoint: 'https://fra1.digitaloceanspaces.com', // DigitalOcean region endpoint
     region: 'fra1', // DigitalOcean Spaces region
     credentials: {
         accessKeyId: process.env.SPACES_KEY, // Use your access key
@@ -15,7 +15,7 @@ const s3 = new S3Client({
 
 const storage = multerS3({
     s3: s3,
-    bucket: 'salonbarber',
+    bucket: 'frank-space',
     acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE, // Automatically sets the correct Content-Type
     key: (req, file, cb) => {

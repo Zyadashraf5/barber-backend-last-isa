@@ -5,7 +5,7 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 // Initialize S3Client
 const s3 = new S3Client({
-    endpoint: 'https://frank-space.fra1.digitaloceanspaces.com', // Replace 'nyc3' with your region
+    endpoint: 'https://fra1.digitaloceanspaces.com', // Replace 'nyc3' with your region
     region: 'fra1', // DigitalOcean Spaces region
     credentials: {
         accessKeyId: process.env.SPACES_KEY, // Use your access key
@@ -17,7 +17,7 @@ const s3 = new S3Client({
 const uploadd = multer({
     storage: multerS3({
         s3: s3,
-        bucket: 'salonbarber', // Replace with your space name
+        bucket: 'frank-space', // Replace with your space name
         acl: 'public-read',
         key: (req, file, cb) => {
             cb(null, `uploads/${Date.now()}_${file.originalname}`);
