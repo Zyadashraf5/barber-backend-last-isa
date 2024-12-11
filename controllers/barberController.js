@@ -116,8 +116,9 @@ exports.getStoreBookings = catchAsync(async (req, res, next) => {
     });
 });
 exports.createServices = catchAsync(async (req, res, next) => {
-    const { services } = req.body; // [ {name : , price : },{name : , price : }]
+    let { services } = req.body; // [ {name : , price : },{name : , price : }]
     console.log(req.body);
+    services = JSON.parse(services);
     const servicesId = [];
     await services.forEach(async (service) => {
         const serviceD = await prisma.barber_service.create({
