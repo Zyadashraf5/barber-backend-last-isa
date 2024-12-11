@@ -1,19 +1,18 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const { PrismaClient } =require( '@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-exports.changeBookingStatus = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
-    const {status} = req.body;
+exports.changeBookingStatus = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const { status } = req.body;
     const booking = await prisma.booking.update({
-        where:{
-            id:+id,
-
+        where: {
+            id: +id,
         },
-        data:{
-            status:status
-        }
+        data: {
+            status: status,
+        },
     });
     res.status(200).json({
         booking,
@@ -80,75 +79,73 @@ exports.getMyStores = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.getActiveStoreBookings = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
+exports.getActiveStoreBookings = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
     const bookings = await prisma.booking.findMany({
-        where:{
-            barberStoreId:+id,
-            status:{
-                notIn:["Finished","Canceled"]
-            }
+        where: {
+            barberStoreId: +id,
+            status: {
+                notIn: ["Finished", "Canceled"],
+            },
         },
-        include:{
-            user:true,
-            booking_services:{
-                include:{
-                    service:true
-                }
-            }
-        }
+        include: {
+            user: true,
+            booking_services: {
+                include: {
+                    service: true,
+                },
+            },
+        },
     });
     res.status(200).json({
-        bookings
+        bookings,
     });
 });
-exports.getStoreBookings = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
+exports.getStoreBookings = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
     const bookings = await prisma.booking.findMany({
-        where:{
-            barberStoreId:+id,
-            
+        where: {
+            barberStoreId: +id,
         },
-        include:{
-            user:true
-        }
+        include: {
+            user: true,
+        },
     });
     res.status(200).json({
-        bookings
+        bookings,
     });
 });
-exports.createServices = catchAsync(async(req,res,next)=>{
-    const {services} = req.body; // [ {name : , price : },{name : , price : }]
+exports.createServices = catchAsync(async (req, res, next) => {
+    const { services } = req.body; // [ {name : , price : },{name : , price : }]
     console.log(req.body);
     const servicesId = [];
-    await services.forEach(async service => {
-        const serviceD  = await prisma.barber_service.create({
-            data:{
-                price:+service.price,
-                serviceName:service.name
-            }
+    await services.forEach(async (service) => {
+        const serviceD = await prisma.barber_service.create({
+            data: {
+                price: +service.price,
+                serviceName: service.name,
+            },
         });
         servicesId.push(serviceD.id);
     });
     req.serviceId = servicesId;
     next();
+    console.log("");
 });
 exports.createStore = catchAsync(async (req, res, next) => {
     const servicesId = req.serviceId;
     req.body.services = undefined;
-   
-
 
     // Handle the photo upload and limit the number of photos to 10
     // const photos = req.files ? req.files.slice(0, 10).map(file => `/photos/${file.filename}`) : [];
     const photos = req.files
-    ? req.files.slice(0, 10).map((file) => file.location)
-    : [];
+        ? req.files.slice(0, 10).map((file) => file.location)
+        : [];
     console.log(req.files);
-    
+
     console.log(photos);
-    
-     req.body.photos =undefined;
+
+    req.body.photos = undefined;
     // Create the store record
     const store = await prisma.barberStore.create({
         data: {
@@ -170,17 +167,15 @@ exports.createStore = catchAsync(async (req, res, next) => {
         })
     );
 
-
     // Fetch the barber store and associated photos to include in the response
     const storeWithPhotos = await prisma.barberStore.findUnique({
         where: { id: store.id },
         include: {
             barberStorePhotos: true, // Include the photos associated with the store
-            barber_service:true,
+            barber_service: true,
         },
     });
     console.log(storeWithPhotos);
-
 
     // Update services if necessary
     await Promise.all(
@@ -194,12 +189,9 @@ exports.createStore = catchAsync(async (req, res, next) => {
 
     // Send the response including the store and its associated photos
     res.status(201).json({
-        store: storeWithPhotos,  // The store with the associated barberStorePhotos
+        store: storeWithPhotos, // The store with the associated barberStorePhotos
     });
 });
-
-
-
 
 // exports.createStore = catchAsync(async (req, res, next) => {
 //     const servicesId = req.serviceId; // Ensure this is being set correctly
@@ -230,104 +222,112 @@ exports.createStore = catchAsync(async (req, res, next) => {
 //     });
 // });
 
-
 function haversineDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Earth's radius in kilometers
     const dLat = degreesToRadians(lat2 - lat1);
     const dLon = degreesToRadians(lon2 - lon1);
     lat1 = degreesToRadians(lat1);
     lat2 = degreesToRadians(lat2);
-  
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) *
+            Math.sin(dLon / 2) *
+            Math.cos(lat1) *
+            Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
-  }
-  
-  // Helper function to convert degrees to radians
-  function degreesToRadians(degrees) {
+}
+
+// Helper function to convert degrees to radians
+function degreesToRadians(degrees) {
     return degrees * (Math.PI / 180);
-  }
-exports.getAllBarbers = catchAsync(async (req,res,next)=>{
-    let {type,nearest,farthest,lat,lng,services} = req.query;
+}
+exports.getAllBarbers = catchAsync(async (req, res, next) => {
+    let { type, nearest, farthest, lat, lng, services } = req.query;
     if (services !== undefined) {
         services = services.split(",");
-    }else {
+    } else {
         services = [];
     }
     const userLat = parseFloat(lat);
     const userLng = parseFloat(lng);
     const whereClause = {
-        barberType: type || "Male"
+        barberType: type || "Male",
     };
 
     if (services.length > 0) {
         whereClause.barber_service = {
             every: {
                 serviceName: {
-                    in: services
-                }
-            }
+                    in: services,
+                },
+            },
         };
     }
-    const barbers = await  prisma.barberStore.findMany({
+    const barbers = await prisma.barberStore.findMany({
         where: whereClause,
-        include:{
-            barber_service:true,
-            favorite:true,
+        include: {
+            barber_service: true,
+            favorite: true,
         },
-        orderBy:{
-            booking:{
-                _count:"desc"
-            }
-        }
+        orderBy: {
+            booking: {
+                _count: "desc",
+            },
+        },
     });
     let barbersInRange;
-    if (nearest&&farthest){
+    if (nearest && farthest) {
         const nearestDistance = parseFloat(nearest);
         const farthestDistance = parseFloat(farthest);
-        barbersInRange = barbers.filter(barber => {
-            const distance = haversineDistance(userLat, userLng, barber.lat, barber.lng);
+        barbersInRange = barbers.filter((barber) => {
+            const distance = haversineDistance(
+                userLat,
+                userLng,
+                barber.lat,
+                barber.lng
+            );
             barber.distance = distance;
             return distance >= nearestDistance && distance <= farthestDistance;
         });
-    }else {
-        barbersInRange=barbers;
+    } else {
+        barbersInRange = barbers;
     }
-    barbersInRange = barbersInRange.map(barber => {
-         barber.isFavorite = barber.favorite.some(fav => fav.userId === req.user.id);
-            return barber;
-        });
+    barbersInRange = barbersInRange.map((barber) => {
+        barber.isFavorite = barber.favorite.some(
+            (fav) => fav.userId === req.user.id
+        );
+        return barber;
+    });
 
     res.status(200).json({
-        barbersInRange
-    })
-});
-exports.getAllServices = catchAsync(async (req,res,next)=>{
-    const services = await prisma.barber_service.findMany({
-
+        barbersInRange,
     });
+});
+exports.getAllServices = catchAsync(async (req, res, next) => {
+    const services = await prisma.barber_service.findMany({});
     res.status(200).json({
-        services
+        services,
     });
 });
-exports.getAllbooked = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
+exports.getAllbooked = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
     const bookings = await prisma.booking.findMany({
-        where:{
-            barberStoreId:+id,
+        where: {
+            barberStoreId: +id,
         },
-        include:{
-            user:{
-                select:{
-                    name:true,
-                    gender:true,
-                    photo:true,
-                    phoneNumber:true,
-                    email:true,
-                }
-            }
-        }
+        include: {
+            user: {
+                select: {
+                    name: true,
+                    gender: true,
+                    photo: true,
+                    phoneNumber: true,
+                    email: true,
+                },
+            },
+        },
     });
     res.status(200).json({
         bookings,
