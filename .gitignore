@@ -1,0 +1,10 @@
+node_modules
+# Keep environment variables out of version control
+
+barber-backend-master.zip
+barber-backend-master2.zip
+knexfile.js
+utils/public/
+.env
+index.html
+space digitalocean.txt

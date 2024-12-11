@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id              Int           @id @unique @default(autoincrement())
+  name            String
+  email           String?       @unique
+  phoneNumber     String?       @unique
+  password        String
+  role            role          @default(User)
+  created_at      DateTime      @default(now())
+  status          user_status   @default(Pending)
+  photo           String        @default("https://static.vecteezy.com/system/resources/previews/024/983/914/original/simple-user-default-icon-free-png.png")
+  barberStore     barberStore[]
+  barberPackageId Int?
+  barberPackage   packages?     @relation(fields: [barberPackageId], references: [id])
+  OTP             String?
+  gender          gender        @default(Male)
+  booking         booking[]
+  favorite        favorite[]
+  ban             Boolean       @default(false)
+}
+
+model favorite {
+  id            Int         @id @unique @default(autoincrement())
+  userId        Int
+  barberStoreId Int
+  user          user        @relation(fields: [userId], references: [id])
+  barberStore   barberStore @relation(fields: [barberStoreId], references: [id])
+}
+
+model barber_service {
+  id               Int                @id @unique @default(autoincrement())
+  barberStoreId    Int?
+  barberStore      barberStore?        @relation(fields: [barberStoreId], references: [id])
+  serviceName      String
+  price            Decimal
+  booking_services booking_services[]
+}
+
+model booking_services {
+  id        Int             @id @unique @default(autoincrement())
+  bookingId Int?
+  booking   booking?        @relation(fields: [bookingId], references: [id])
+  serviceId Int?
+  service   barber_service? @relation(fields: [serviceId], references: [id])
+}
+
+model barberStore {
+  id                Int              @id @unique @default(autoincrement())
+  name              String
+  phone             String
+  desc              String?
+  userId            Int
+  user              user             @relation(fields: [userId], references: [id])
+  address           String
+  lat               Decimal
+  lng               Decimal
+  photo             String?         @default("https://uxwing.com/wp-content/themes/uxwing/download/beauty-fashion/hair-salon-icon.png")
+  barber_service    barber_service[]
+  barberType        barber_type      @default(Male)
+  booking           booking[]
+  startTime         String           @default("8 AM")
+  endTime           String           @default("9 PM")
+  barberServiceTime Decimal            @default(1)
+  favorite          favorite[]
+  rating            Decimal            @default(5)
+  barberStorePhotos barberStorePhoto[] // Add this line to relate photos to the barber store
+  paymentType      Payment_Type       @default(Cash)
+}
+
+model barberStorePhoto {
+  id            Int      @id @unique @default(autoincrement())
+  photoUrl      String   // URL or path to the photo
+  barberStoreId Int
+  barberStore   barberStore @relation(fields: [barberStoreId], references: [id])
+}
+
+model packages {
+  id    Int     @id @unique @default(autoincrement())
+  name  String
+  price Float
+  photo String?
+  user  user[]
+}
+
+model booking {
+  id               Int                @id @unique @default(autoincrement())
+  userId           Int
+  user             user               @relation(fields: [userId], references: [id])
+  barberStoreId    Int
+  barberStore      barberStore        @relation(fields: [barberStoreId], references: [id])
+  Date             DateTime           @default(now())
+  status           booking_status     @default(Booked)
+  paymentType      Payment_Type       @default(Cash)
+  rating           Int?
+  ratingDesc       String?
+  booking_services booking_services[]
+}
+
+enum user_status {
+  Verifed
+  Pending
+}
+
+enum role {
+  Admin
+  User
+  Barber
+}
+
+enum barber_type {
+  Male
+  Female
+  Kids
+  Makeup
+}
+
+enum booking_status {
+  Booked
+  Waiting
+  InProcess
+  Finished
+  Canceled
+}
+enum Payment_Type {
+  Cash
+  Card
+  both
+}
+
+enum gender {
+  Male
+  Female
+}
