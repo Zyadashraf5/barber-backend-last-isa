@@ -5,8 +5,8 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 // Initialize S3Client
 const s3 = new S3Client({
-    endpoint: 'https://nyc3.digitaloceanspaces.com', // Replace 'nyc3' with your region
-    region: 'nyc3', // DigitalOcean Spaces region
+    endpoint: 'https://frank-space.fra1.digitaloceanspaces.com', // Replace 'nyc3' with your region
+    region: 'fra1', // DigitalOcean Spaces region
     credentials: {
         accessKeyId: process.env.SPACES_KEY, // Use your access key
         secretAccessKey: process.env.SPACES_SECRET // Use your secret key
