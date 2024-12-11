@@ -26,11 +26,7 @@ exports.adminGetAllUsers = catchAsync(async (req, res, next) => {
             role: "User", // Filter users where role is 'barber'
         },
         include: {
-            barberStore: {
-                include: {
-                    booking: true,
-                },
-            },
+            booking: true,
             // barberReviews: true,
         },
     });
