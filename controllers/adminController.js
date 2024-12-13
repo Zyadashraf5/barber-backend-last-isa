@@ -37,6 +37,8 @@ exports.adminGetAllUsers = catchAsync(async (req, res, next) => {
     });
 });
 exports.addBanner = catchAsync(async (req, res, next) => {
+    console.log(req.body);
+    
     const photo = req.file ? req.file.location : null;
     if (!photo) {
         return next(new AppError("No photo uploaded!", 400));
