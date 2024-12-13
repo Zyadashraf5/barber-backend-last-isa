@@ -32,7 +32,12 @@ model user {
   favorite        favorite[]
   ban             Boolean       @default(false)
 }
-
+model banner { 
+    id              Int           @id @unique @default(autoincrement())
+    photo           String?        
+    expire_at       DateTime?
+    isActive          Boolean     @default(true)
+}
 model favorite {
   id            Int         @id @unique @default(autoincrement())
   userId        Int

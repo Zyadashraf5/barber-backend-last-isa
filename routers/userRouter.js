@@ -1,7 +1,7 @@
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
 const adminController = require("../controllers/adminController");
-
+const upload = require("../utils/uploadConfig");
 const router = require("express").Router();
 router.use(authController.isLoggedIn);
 router.route("/booking/all").get(userController.getAllBooking);
@@ -21,7 +21,18 @@ router
 router.route("/favorite").get(userController.getFavorite);
 router.route("/favorite/:id").get(userController.addFavorite);
 
-// admin
+router.route("/activeBanner").get(adminController.getAllActiveBanners);
+router
+    .route("/banner/toggle/:id")
+    .get(authController.restrictTo("Admin"), adminController.toggleBanner);
+router
+    .route("/banners")
+    .get(authController.restrictTo("Admin"), adminController.getAllBanners)
+    .post(
+        authController.restrictTo("Admin"),
+        upload.single("photo"),
+        adminController.addBanner
+    );
 router
     .route("/")
     .get(authController.restrictTo("Admin"), adminController.adminGetAllUsers);

@@ -36,7 +36,67 @@ exports.adminGetAllUsers = catchAsync(async (req, res, next) => {
         data: users,
     });
 });
-
+exports.addBanner = catchAsync(async (req, res, next) => {
+    const photo = req.file ? req.file.location : null;
+    if (!photo) {
+        return next(new AppError("No photo uploaded!", 400));
+    }
+    const banner = await prisma.banner.create({
+        data: {
+            photo,
+            expire_at: req.body.expire_at ? new Date(req.body.expire_at) : null,
+        },
+    });
+    res.status(201).json({
+        banner,
+    });
+});
+exports.getAllActiveBanners = catchAsync(async (req, res, next) => {
+    currentDate = Date.now();
+    const activeBanners = await prisma.banner.findMany({
+        where: {
+            isActive: true,
+            OR: [
+                {
+                    expire_at: {
+                        gte: currentDate, // Expiration date is in the future
+                    },
+                },
+                {
+                    expire_at: null, // No expiration date set
+                },
+            ],
+        },
+    });
+    res.status(200).json({
+        banner: activeBanners,
+    });
+});
+exports.getAllBanners = catchAsync(async (req, res, next) => {
+    currentDate = Date.now();
+    const banners = await prisma.banner.findMany({});
+    res.status(200).json({
+        banners,
+    });
+});
+exports.toggleBanner = catchAsync(async (req, res, next) => {
+    let banner = await prisma.banner.findUnique({
+        where: {
+            id: +req.params.id,
+        },
+    });
+    banner = await prisma.banner.update({
+        where: {
+            id: banner.id,
+        },
+        data: {
+            isActive: !banner.isActive,
+        },
+    });
+    res.status(200).json({
+        banner,
+    });
+});
 // Admin: Get all bookings with pagination
 exports.adminGetAllBookings = catchAsync(async (req, res, next) => {
     const bookings = await prisma.booking.findMany({
