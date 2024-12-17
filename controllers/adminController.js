@@ -38,7 +38,7 @@ exports.adminGetAllUsers = catchAsync(async (req, res, next) => {
 });
 exports.addBanner = catchAsync(async (req, res, next) => {
     console.log(req.body);
-    
+
     const photo = req.file ? req.file.location : null;
     if (!photo) {
         return next(new AppError("No photo uploaded!", 400));
@@ -54,14 +54,14 @@ exports.addBanner = catchAsync(async (req, res, next) => {
     });
 });
 exports.getAllActiveBanners = catchAsync(async (req, res, next) => {
-    currentDate = Date.now();
+    currentDate = new Date();
     const activeBanners = await prisma.banner.findMany({
         where: {
             isActive: true,
             OR: [
                 {
                     expire_at: {
-                        gte: currentDate, // Expiration date is in the future
+                        gte: currentDate.toISOString(), // Expiration date is in the future
                     },
                 },
                 {
