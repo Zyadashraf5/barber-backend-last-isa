@@ -271,6 +271,7 @@ exports.getAllBarbers = catchAsync(async (req, res, next) => {
         include: {
             barber_service: true,
             favorite: true,
+            barberStorePhotos: true,
         },
         orderBy: {
             booking: {
