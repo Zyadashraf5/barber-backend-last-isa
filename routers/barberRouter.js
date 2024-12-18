@@ -30,7 +30,7 @@ router
 // router.route('/services').post(authController.restrictTo("Barber"), barberController.createServices);
 router
     .route("/switchStatus/:id")
-    .post(adminController.restrictTo("Barber"), barberController.switchStatus);
+    .post(authController.restrictTo("Barber"), barberController.switchStatus);
 router.route("/services").get(barberController.getAllServices);
 router.route("/bookings/status/:id").post(barberController.changeBookingStatus);
 router
