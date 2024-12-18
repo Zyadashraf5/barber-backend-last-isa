@@ -11,6 +11,14 @@ exports.adminGetAllBarbers = catchAsync(async (req, res, next) => {
         where: {
             role: "Barber", // Filter users where role is 'barber'
         },
+        include: {
+            barberStore: {
+                include: {
+                    barber_service: true,
+                    booking: true,
+                },
+            },
+        },
     });
 
     res.status(200).json({
