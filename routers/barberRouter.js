@@ -37,7 +37,7 @@ router
     .route("/bookings/active/:id")
     .get(barberController.getActiveStoreBookings);
 router.route("/bookings/:id").get(barberController.getStoreBookings);
-
+router.route("/myClients/:id").get(barberController.getMyClients);
 // admin
 router
     .route("/admin/allBarbers")
