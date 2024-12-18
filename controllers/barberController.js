@@ -204,7 +204,7 @@ exports.switchStatus = catchAsync(async (req, res, next) => {
         },
     });
     res.status(200).json({
-        store,
+        status: req.body.status,
     });
 });
 
