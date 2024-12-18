@@ -34,7 +34,7 @@ router
         adminController.addBanner
     );
 router
-    .route("admin/allUsers")
+    .route("/admin/allUsers")
     .get(authController.restrictTo("Admin"), adminController.adminGetAllUsers);
 
 module.exports = router;
