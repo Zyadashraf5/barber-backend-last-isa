@@ -41,6 +41,7 @@ exports.adminGetAllUsers = catchAsync(async (req, res, next) => {
                             service: true,
                         },
                     },
+                    barberStore: true,
                 },
             },
             // barberReviews: true,
