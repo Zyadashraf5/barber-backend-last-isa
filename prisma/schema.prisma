@@ -114,6 +114,7 @@ model booking {
   rating           Int?
   ratingDesc       String?
   booking_services booking_services[]
+  total            Decimal?           
 }
 
 enum user_status {

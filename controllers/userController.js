@@ -1,100 +1,104 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const { PrismaClient } =require( '@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-exports.cancelBooking = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
+exports.cancelBooking = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
     let booking = await prisma.booking.update({
-        where:{
-            id:+id
+        where: {
+            id: +id,
         },
-        data:{
-            status:"Canceled"
-        }
+        data: {
+            status: "Canceled",
+        },
     });
     res.status(200).json({
-        booking
+        booking,
     });
 });
-exports.finishBooking = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
+exports.finishBooking = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
     let booking = await prisma.booking.update({
-        where:{
-            id:+id
+        where: {
+            id: +id,
         },
-        data:{
-            status:"Finished"
-        }
+        data: {
+            status: "Finished",
+        },
     });
     res.status(200).json({
-        booking
+        booking,
     });
 });
-exports.getBookingByDate = catchAsync(async (req,res,next)=>{
-    const {date} = req.query;
-    const {id} = req.params;
+exports.getBookingByDate = catchAsync(async (req, res, next) => {
+    const { date } = req.query;
+    const { id } = req.params;
     let currentDate = new Date(date);
     let datePlusDay = new Date(date);
     datePlusDay.setDate(datePlusDay.getDate() + 1);
-    console.log(currentDate,datePlusDay);
+    console.log(currentDate, datePlusDay);
     const booking = await prisma.booking.findMany({
-        where:{
-            barberStoreId : +id,
-            Date:{
+        where: {
+            barberStoreId: +id,
+            Date: {
                 gte: currentDate,
-                lt: datePlusDay
-            }
+                lt: datePlusDay,
+            },
         },
-        include:{
-            booking_services:true,
-            barberStore:true
-        }
+        include: {
+            booking_services: true,
+            barberStore: true,
+        },
     });
     res.status(200).json({
-        booking
+        booking,
     });
 });
-exports.getAllBooking = catchAsync(async (req,res,next)=>{
-    const  {lat,lng} = req.query;
-    console.log(lat,lng);
+exports.getAllBooking = catchAsync(async (req, res, next) => {
+    const { lat, lng } = req.query;
+    console.log(lat, lng);
     let booking = await prisma.booking.findMany({
-        where:{
-            userId:+req.user.id
+        where: {
+            userId: +req.user.id,
         },
-        include:{
-            booking_services:{
-                include:{
-                    service:true
-                }
+        include: {
+            booking_services: {
+                include: {
+                    service: true,
+                },
             },
-            barberStore:true,
-            user:true
-        }
+            barberStore: true,
+            user: true,
+        },
     });
-    booking = booking.map(e=>{
-        e.barberStore.distance = haversineDistance(e.barberStore.lat,e.barberStore.lng,lat,lng);
-      
+    booking = booking.map((e) => {
+        e.barberStore.distance = haversineDistance(
+            e.barberStore.lat,
+            e.barberStore.lng,
+            lat,
+            lng
+        );
+
         return e;
     });
-    
+
     res.status(200).json({
-        booking
+        booking,
     });
 });
-exports.rate = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
-    const {rating,ratingDesc} = req.body;
+exports.rate = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const { rating, ratingDesc } = req.body;
     let booking = await prisma.booking.update({
-        where:{
-            id:+id
+        where: {
+            id: +id,
         },
-        data:{
-
-            rating:+rating,
-            ratingDesc:ratingDesc,
-        }
+        data: {
+            rating: +rating,
+            ratingDesc: ratingDesc,
+        },
     });
-    
+
     res.status(200).json({
         booking,
     });
@@ -105,164 +109,186 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
     const dLon = degreesToRadians(lon2 - lon1);
     lat1 = degreesToRadians(lat1);
     lat2 = degreesToRadians(lat2);
-  
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.sin(dLon / 2) *
+            Math.sin(dLon / 2) *
+            Math.cos(lat1) *
+            Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
-  }
-  
-  // Helper function to convert degrees to radians
-  function degreesToRadians(degrees) {
+}
+
+// Helper function to convert degrees to radians
+function degreesToRadians(degrees) {
     return degrees * (Math.PI / 180);
-  }
-exports.getFavorite = catchAsync(async (req,res,next)=>{
-    const  {lat,lng} = req.query;
+}
+exports.getFavorite = catchAsync(async (req, res, next) => {
+    const { lat, lng } = req.query;
 
     let favorites = await prisma.favorite.findMany({
-        where:{
-            userId:+req.user.id,
+        where: {
+            userId: +req.user.id,
         },
-        include:{
-            barberStore:{
-                include:{
-                    barber_service:true,
-                 
-                }
-            }
-
-        }
+        include: {
+            barberStore: {
+                include: {
+                    barber_service: true,
+                },
+            },
+        },
     });
-    favorites = favorites.map(e=>{
-        e.barberStore.distance = haversineDistance(e.barberStore.lat,e.barberStore.lng,lat,lng);
+    favorites = favorites.map((e) => {
+        e.barberStore.distance = haversineDistance(
+            e.barberStore.lat,
+            e.barberStore.lng,
+            lat,
+            lng
+        );
         return e;
     });
     res.status(200).json({
-        favorites
+        favorites,
     });
 });
-exports.addFavorite = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
+exports.addFavorite = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
     let favorite;
     let isFavorite = false;
-    const exist = await prisma.favorite.findFirst({ 
-        where:{
-            barberStoreId:+id,
-            userId:+req.user.id
-        }
+    const exist = await prisma.favorite.findFirst({
+        where: {
+            barberStoreId: +id,
+            userId: +req.user.id,
+        },
     });
-    if (exist){
-       favorite =  await prisma.favorite.delete({
-            where:{
-                id:exist.id
-            }
+    if (exist) {
+        favorite = await prisma.favorite.delete({
+            where: {
+                id: exist.id,
+            },
         });
-    }else {
-         favorite = await prisma.favorite.create({
-            data:{
-                barberStoreId:+id,
-                userId:+req.user.id,
-            }
+    } else {
+        favorite = await prisma.favorite.create({
+            data: {
+                barberStoreId: +id,
+                userId: +req.user.id,
+            },
         });
         isFavorite = true;
     }
 
-   
     res.status(200).json({
         isFavorite,
     });
 });
-exports.book = catchAsync(async (req,res,next)=>{
-    const {id} = req.params;
-    let {servicesId,date,paymentType} = req.body;
-    const {lat,lng} = req.query;
-    date = new Date(date.replace(' ', 'T') + 'Z');
-    var booking = await prisma.booking.create({
-        data:{
-            barberStoreId : +id,
-            userId : +req.user.id,
-            Date:date,
-            paymentType,
-            
-        }
+exports.book = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    let { servicesId, date, paymentType } = req.body;
+    const { lat, lng } = req.query;
+    date = new Date(date.replace(" ", "T") + "Z");
+    const services = await prisma.barber_service.findMany({
+        where: {
+            id: {
+                in: servicesId,
+            },
+        },
     });
-    if (!servicesId){
-        return next(new AppError("serviceId cant be null!",400));
+    const total = services.reduce((sum, element) => sum + element.price, 0);
+    var booking = await prisma.booking.create({
+        data: {
+            barberStoreId: +id,
+            userId: +req.user.id,
+            Date: date,
+            paymentType,
+            total,
+        },
+    });
+    if (!servicesId) {
+        return next(new AppError("serviceId cant be null!", 400));
     }
-    servicesId.forEach(async e => {
-        await prisma.booking_services.create({
-            data:{
-                bookingId:booking.id,
-                serviceId:+e,
 
-            }
+    servicesId.forEach(async (e) => {
+        await prisma.booking_services.create({
+            data: {
+                bookingId: booking.id,
+                serviceId: +e,
+            },
         });
     });
     booking = await prisma.booking.findUnique({
-        where:{
-            id:booking.id
+        where: {
+            id: booking.id,
         },
-        include:{
-            barberStore:true,   
-            booking_services:{
-                include:{
-                    service:true
-                }
+        include: {
+            barberStore: true,
+            booking_services: {
+                include: {
+                    service: true,
+                },
             },
-            user:true
-        }
+            user: true,
+        },
     });
 
-    booking.barberStore.distance = haversineDistance(booking.barberStore.lat,booking.barberStore.lng,lat,lng);
+    booking.barberStore.distance = haversineDistance(
+        booking.barberStore.lat,
+        booking.barberStore.lng,
+        lat,
+        lng
+    );
 
     res.status(200).json({
         booking,
     });
 });
-exports.getMyBooking = catchAsync(async(req,res,next)=>{
-    const  {lat,lng} = req.query;
+exports.getMyBooking = catchAsync(async (req, res, next) => {
+    const { lat, lng } = req.query;
 
     const booking = await prisma.booking.findMany({
-        where:{
-            userId:req.user.id,
+        where: {
+            userId: req.user.id,
             OR: [
                 {
-                    status:"Finished",
-                   rating:null 
-                }, {
-                    status:  {
-                        notIn: ["Finished","Canceled"]
+                    status: "Finished",
+                    rating: null,
+                },
+                {
+                    status: {
+                        notIn: ["Finished", "Canceled"],
                     },
-                }
-            ]
-
+                },
+            ],
         },
-        include:{
-            booking_services:{
-                include:{
-                    service:true
-                }
+        include: {
+            booking_services: {
+                include: {
+                    service: true,
+                },
             },
-            barberStore:true,
-            user:true
-            
+            barberStore: true,
+            user: true,
         },
-        orderBy:{
-            Date:"asc"
-        }
+        orderBy: {
+            Date: "asc",
+        },
     });
     let lastBooking;
-    if (booking.length>0){
+    if (booking.length > 0) {
         lastBooking = booking[0];
-    }else {
-        lastBooking = null
+    } else {
+        lastBooking = null;
     }
-    if (lastBooking){
-
-        lastBooking.barberStore.distance = haversineDistance(lastBooking.barberStore.lat,lastBooking.barberStore.lng,lat,lng);
+    if (lastBooking) {
+        lastBooking.barberStore.distance = haversineDistance(
+            lastBooking.barberStore.lat,
+            lastBooking.barberStore.lng,
+            lat,
+            lng
+        );
     }
     res.status(200).json({
-        booking : lastBooking,
+        booking: lastBooking,
     });
 });
 exports.getBookingById = catchAsync(async (req, res, next) => {
@@ -273,13 +299,13 @@ exports.getBookingById = catchAsync(async (req, res, next) => {
         },
         include: {
             booking_services: true,
-            barberStore: true
-        }
+            barberStore: true,
+        },
     });
 
     // Check if booking is retrieved successfully
     if (!booking) {
-        return next(new Error('No booking found with that ID'));
+        return next(new Error("No booking found with that ID"));
     }
 
     // Convert booking.date to a Date object if it's not already
@@ -292,34 +318,34 @@ exports.getBookingById = catchAsync(async (req, res, next) => {
     // Check if booking date is within the next 30 minutes
     if (bookingDate > now && bookingDate <= thirtyMinutesLater) {
         booking = await prisma.booking.update({
-            data:{
-                status:"Waiting"
+            data: {
+                status: "Waiting",
             },
-            where:{
-                id:+id
-            }
+            where: {
+                id: +id,
+            },
         });
-    }else  if (bookingDate > now) {
+    } else if (bookingDate > now) {
         booking = await prisma.booking.update({
-            data:{
-                status:"Booked"
+            data: {
+                status: "Booked",
             },
-            where:{
-                id:+id
-            }
+            where: {
+                id: +id,
+            },
         });
-    }else {
+    } else {
         booking = await prisma.booking.update({
-            data:{
-                status:"InProcess"
+            data: {
+                status: "InProcess",
             },
-            where:{
-                id:+id
-            }
+            where: {
+                id: +id,
+            },
         });
     }
 
     res.status(200).json({
-        booking
+        booking,
     });
 });
