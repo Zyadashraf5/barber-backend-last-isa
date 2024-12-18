@@ -193,6 +193,20 @@ exports.createStore = catchAsync(async (req, res, next) => {
         store: storeWithPhotos, // The store with the associated barberStorePhotos
     });
 });
+exports.switchStatus = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const store = await prisma.barberStore.update({
+        where: {
+            id: +id,
+        },
+        data: {
+            status: req.body.status,
+        },
+    });
+    res.status(200).json({
+        store,
+    });
+});
 
 // exports.createStore = catchAsync(async (req, res, next) => {
 //     const servicesId = req.serviceId; // Ensure this is being set correctly
@@ -337,3 +351,17 @@ exports.getAllbooked = catchAsync(async (req, res, next) => {
 });
 
 // func to make barber choise his payment methos [cash, visa]
+exports.changePaymentType = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const store = await prisma.barberStore.update({
+        where: {
+            id: +id,
+        },
+        data: {
+            paymentType: req.body.paymentType,
+        },
+    });
+    res.status(200).json({
+        store,
+    });
+});

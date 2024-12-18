@@ -84,6 +84,7 @@ model barberStore {
   rating            Decimal            @default(5)
   barberStorePhotos barberStorePhoto[] // Add this line to relate photos to the barber store
   paymentType      Payment_Type       @default(Cash)
+  status            barber_status @default(Open)
 }
 
 model barberStorePhoto {
@@ -132,7 +133,10 @@ enum barber_type {
   Kids
   Makeup
 }
-
+enum barber_status {
+  Closed
+  Open
+}
 enum booking_status {
   Booked
   Waiting
