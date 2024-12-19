@@ -227,7 +227,7 @@ exports.checkPackage = catchAsync(async (req, res, next) => {
             barberPackage: true,
         },
     });
-    if (user.role == "User" || user.role == "Admin") {
+    if (user.role === "User" || user.role === "Admin") {
         next();
     }
     if (user.packagePurchasedDate && user.barberPackageId) {
