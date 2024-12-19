@@ -1,27 +1,26 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const { PrismaClient } =require( '@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-exports.buyPackage = catchAsync(async (req,res,next)=>{
-    const {packageId} = req.body;
+exports.buyPackage = catchAsync(async (req, res, next) => {
+    const { packageId } = req.body;
     await prisma.user.update({
-        where:{
-            id:req.user.id
+        where: {
+            id: req.user.id,
         },
-        data : {
-            barberPackage:{
-                connect : {
-                    id : packageId
-                }
-            }
-        }
+        data: {
+            barberPackage: {
+                connect: {
+                    id: packageId,
+                },
+            },
+        },
     });
-
 });
-exports.getAllPackages = catchAsync(async (req,res,next)=>{
+exports.getAllPackages = catchAsync(async (req, res, next) => {
     const packages = await prisma.packages.findMany({});
     res.status(200).json({
-        packages
+        packages,
     });
 });
 exports.createPackage = catchAsync(async (req, res, next) => {
@@ -31,24 +30,29 @@ exports.createPackage = catchAsync(async (req, res, next) => {
 
     // Convert the price to a float if it's a string
     const price = parseFloat(req.body.price);
+    const { type, duration, smallDesc, desc } = req.body;
 
     // Check if the price is a valid number
     if (isNaN(price)) {
         return res.status(400).json({
-            status: 'error',
-            message: 'Invalid price value provided'
+            status: "error",
+            message: "Invalid price value provided",
         });
     }
 
     const package = await prisma.packages.create({
         data: {
             photo,
+            type,
+            duration,
+            smallDesc,
+            desc,
             name: req.body.name,
-            price: price // Ensure price is a float
-        }
+            price: price, // Ensure price is a float
+        },
     });
 
     res.status(201).json({
-        package
+        package,
     });
 });

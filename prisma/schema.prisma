@@ -99,6 +99,10 @@ model packages {
   name  String
   price Float
   photo String?
+  smallDesc String ?
+  desc      String ?
+  type String ?
+  duration packageDuration @default(Annually)
   user  user[]
 }
 model coupon{
@@ -125,6 +129,10 @@ model booking {
   total            Decimal?     
   couponId         Int?             
   coupon           coupon?       @relation(fields: [couponId],references: [id])
+}
+enum packageDuration {
+  Annually
+  Monthly
 }
 
 enum user_status {
