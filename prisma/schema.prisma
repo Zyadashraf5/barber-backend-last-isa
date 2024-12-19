@@ -101,7 +101,15 @@ model packages {
   photo String?
   user  user[]
 }
+model coupon{
+    id    Int     @id @unique @default(autoincrement())
+    code String  @unique
+    discount Decimal?
+    expireDate DateTime?
+    
 
+    booking booking[]
+}
 model booking {
   id               Int                @id @unique @default(autoincrement())
   userId           Int
@@ -114,7 +122,9 @@ model booking {
   rating           Int?
   ratingDesc       String?
   booking_services booking_services[]
-  total            Decimal?           
+  total            Decimal?     
+  couponId         Int?             
+  coupon           coupon?       @relation(fields: [couponId],references: [id])
 }
 
 enum user_status {

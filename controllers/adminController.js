@@ -26,7 +26,35 @@ exports.adminGetAllBarbers = catchAsync(async (req, res, next) => {
         data: barbers,
     });
 });
-
+exports.getAllCoupons = catchAsync(async (req, res, next) => {
+    const coupons = await prisma.coupon.findMany({});
+    res.status(200).json({
+        coupons,
+    });
+});
+exports.deleteCoupon = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const coupon = await prisma.coupon.delete({
+        where: {
+            id: +id,
+        },
+    });
+    res.status(204).json({
+        coupon,
+    });
+});
+exports.createCoupon = catchAsync(async (req, res, next) => {
+    const { couponCode, discount } = req.body;
+    const coupon = await prisma.coupon.create({
+        data: {
+            discount,
+            code: couponCode,
+        },
+    });
+    res.status(200).json({
+        coupon,
+    });
+});
 // Admin: Get all users with pagination
 exports.adminGetAllUsers = catchAsync(async (req, res, next) => {
     const users = await prisma.user.findMany({

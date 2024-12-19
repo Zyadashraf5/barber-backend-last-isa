@@ -12,8 +12,14 @@ router.route("/resetPassword").post(authController.resetPassword);
 router.use(authController.isLoggedIn);
 router.route("/me").get(authController.getMe);
 router.route("/changePassword").post(authController.changePassword);
-
+router
+    .route("/coupon")
+    .get(authController.restrictTo("Admin"), adminController.getAllCoupons)
+    .post(authController.restrictTo("Admin"), adminController.createCoupon);
 // admin
+router
+    .route("/coupon/:id")
+    .delete(authController.restrictTo("Admin"), adminController.deleteCoupon);
 router
     .route("/ban/:userId")
     .get(authController.restrictTo("Admin"), adminController.banUser);

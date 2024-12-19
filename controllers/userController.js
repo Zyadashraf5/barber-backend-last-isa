@@ -16,6 +16,20 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
         booking,
     });
 });
+exports.checkCoupon = catchAsync(async (req, res, next) => {
+    const { code } = req.body;
+    const coupon = await prisma.coupon.findUnique({
+        where: {
+            code,
+        },
+    });
+    if (!coupon) {
+        return next(new AppError("no coupon found!", 404));
+    }
+    res.status(200).json({
+        coupon,
+    });
+});
 exports.finishBooking = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     let booking = await prisma.booking.update({
@@ -184,7 +198,8 @@ exports.addFavorite = catchAsync(async (req, res, next) => {
 });
 exports.book = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    let { servicesId, date, paymentType } = req.body;
+
+    let { servicesId, date, paymentType, code } = req.body;
     const { lat, lng } = req.query;
     date = new Date(date.replace(" ", "T") + "Z");
     const services = await prisma.barber_service.findMany({
@@ -194,7 +209,15 @@ exports.book = catchAsync(async (req, res, next) => {
             },
         },
     });
-    const total = services.reduce((sum, element) => sum + element.price, 0);
+    const coupon = await prisma.coupon.findUnique({
+        where: {
+            code,
+        },
+    });
+    let total = services.reduce((sum, element) => sum + element.price, 0);
+    if (coupon) {
+        total *= total * coupon.discount;
+    }
     var booking = await prisma.booking.create({
         data: {
             barberStoreId: +id,
@@ -202,6 +225,7 @@ exports.book = catchAsync(async (req, res, next) => {
             Date: date,
             paymentType,
             total,
+            couponId: coupon.id,
         },
     });
     if (!servicesId) {

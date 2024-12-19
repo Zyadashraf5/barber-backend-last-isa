@@ -33,6 +33,7 @@ router
         upload.single("photo"),
         adminController.addBanner
     );
+router.route("/checkCoupon").get(userController.checkCoupon);
 router
     .route("/admin/allUsers")
     .get(authController.restrictTo("Admin"), adminController.adminGetAllUsers);
