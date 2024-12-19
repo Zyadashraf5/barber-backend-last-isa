@@ -209,11 +209,15 @@ exports.book = catchAsync(async (req, res, next) => {
             },
         },
     });
-    const coupon = await prisma.coupon.findUnique({
-        where: {
-            code,
-        },
-    });
+    let coupon;
+    if (code) {
+        coupon = await prisma.coupon.findUnique({
+            where: {
+                code,
+            },
+        });
+    }
+
     let total = services.reduce((sum, element) => sum + element.price, 0);
     if (coupon) {
         total *= total * coupon.discount;
