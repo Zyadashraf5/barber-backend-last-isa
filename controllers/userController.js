@@ -218,16 +218,30 @@ exports.book = catchAsync(async (req, res, next) => {
     if (coupon) {
         total *= total * coupon.discount;
     }
-    var booking = await prisma.booking.create({
-        data: {
-            barberStoreId: +id,
-            userId: +req.user.id,
-            Date: date,
-            paymentType,
-            total,
-            couponId: coupon != null ? coupon.id : null,
-        },
-    });
+    let booking;
+    if (coupon) {
+        booking = await prisma.booking.create({
+            data: {
+                barberStoreId: +id,
+                userId: +req.user.id,
+                Date: date,
+                paymentType,
+                total,
+                couponId: coupon.id,
+            },
+        });
+    } else {
+        booking = await prisma.booking.create({
+            data: {
+                barberStoreId: +id,
+                userId: +req.user.id,
+                Date: date,
+                paymentType,
+                total,
+            },
+        });
+    }
+
     if (!servicesId) {
         return next(new AppError("serviceId cant be null!", 400));
     }
