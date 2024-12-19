@@ -223,7 +223,7 @@ exports.book = catchAsync(async (req, res, next) => {
         total *= total * coupon.discount;
     }
     let booking;
-    if (code) {
+    if (coupon) {
         booking = await prisma.booking.create({
             data: {
                 barberStoreId: +id,
