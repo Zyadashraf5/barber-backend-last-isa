@@ -225,7 +225,7 @@ exports.book = catchAsync(async (req, res, next) => {
             Date: date,
             paymentType,
             total,
-            couponId: coupon.id,
+            couponId: coupon != null ? coupon.id : null,
         },
     });
     if (!servicesId) {
