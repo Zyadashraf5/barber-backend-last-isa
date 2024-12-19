@@ -278,8 +278,8 @@ exports.checkPackage = catchAsync(async (req, res, next) => {
                 next();
                 break;
         }
-        next();
     }
+    next();
 });
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
