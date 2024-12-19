@@ -4,6 +4,7 @@ const adminController = require("../controllers/adminController");
 const upload = require("../utils/uploadConfig");
 const router = require("express").Router();
 router.use(authController.isLoggedIn);
+router.use(authController.checkPackage);
 router.route("/booking/all").get(userController.getAllBooking);
 router.route("/booking").get(userController.getMyBooking);
 router

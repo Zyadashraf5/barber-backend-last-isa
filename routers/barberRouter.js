@@ -6,6 +6,7 @@ const router = require("express").Router();
 // const upload = require('../utils/upload'); // Import the multer upload middleware
 
 router.use(authController.isLoggedIn);
+router.use(authController.checkPackage);
 router
     .route("/me")
     .get(authController.restrictTo("Barber"), barberController.getMyStores);

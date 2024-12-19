@@ -31,6 +31,7 @@ model user {
   booking         booking[]
   favorite        favorite[]
   ban             Boolean       @default(false)
+  packagePurchasedDate DateTime?
 }
 model banner { 
     id              Int           @id @unique @default(autoincrement())
