@@ -278,6 +278,8 @@ exports.checkPackage = catchAsync(async (req, res, next) => {
                 next();
                 break;
         }
+    } else {
+        return next(new AppError("No Package Found", 400));
     }
     next();
 });
