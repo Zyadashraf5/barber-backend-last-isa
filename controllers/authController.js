@@ -20,10 +20,6 @@ exports.register = catchAsync(async (req, res, next) => {
 
     const photo = req.file ? req.file.location : null; // Use location if uploading to S3/DigitalOcean Spaces
 
-    if (!photo) {
-        return next(new AppError("No photo uploaded!", 400));
-    }
-
     const { email, password, ...otherDetails } = req.body;
     if (!email || !password) {
         return next(new AppError("email and password are required!", 400));
@@ -51,7 +47,7 @@ exports.register = catchAsync(async (req, res, next) => {
     if (isNaN(email)) {
         user = await prisma.user.create({
             data: {
-                photo,
+                photo: photo != null ? photo : undefined,
                 email: email,
                 password: hash,
                 ...otherDetails,
@@ -60,7 +56,7 @@ exports.register = catchAsync(async (req, res, next) => {
     } else {
         user = await prisma.user.create({
             data: {
-                photo,
+                photo: photo != null ? photo : undefined,
                 phoneNumber: email,
                 password: hash,
                 ...otherDetails,
