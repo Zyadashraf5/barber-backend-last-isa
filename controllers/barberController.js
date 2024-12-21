@@ -284,6 +284,11 @@ exports.getAllBarbers = catchAsync(async (req, res, next) => {
     const userLng = parseFloat(lng);
     const whereClause = {
         barberType: type || "Male",
+        user: {
+            barberPackageId: {
+                not: null,
+            },
+        },
     };
 
     if (services.length > 0) {
@@ -301,6 +306,7 @@ exports.getAllBarbers = catchAsync(async (req, res, next) => {
             barber_service: true,
             favorite: true,
             barberStorePhotos: true,
+            user: true,
         },
         orderBy: {
             booking: {
