@@ -19,7 +19,11 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
     });
 });
 exports.getAbout = catchAsync(async (req, res, next) => {
-    const about = await prisma.about.findFirst({});
+    const about = await prisma.about.findFirst({
+        where: {
+            active: true,
+        },
+    });
     res.status(200).json({ about });
 });
 exports.sendSupport = catchAsync(async (req, res, next) => {
