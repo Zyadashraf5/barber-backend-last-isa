@@ -26,14 +26,14 @@ exports.register = catchAsync(async (req, res, next) => {
     }
     var exist;
     if (isNaN(email)) {
-        exist = await prisma.user.findUnique({
+        exist = await prisma.user.findFirst({
             where: {
                 email: email,
                 active: true,
             },
         });
     } else {
-        exist = await prisma.user.findUnique({
+        exist = await prisma.user.findFirst({
             where: {
                 phoneNumber: email,
                 active: true,
@@ -175,14 +175,14 @@ exports.login = catchAsync(async (req, res, next) => {
     }
     var user;
     if (isNaN(email)) {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 email: email,
                 active: true,
             },
         });
     } else {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 phoneNumber: email,
                 active: true,
@@ -311,15 +311,17 @@ exports.forgetPassword = catchAsync(async (req, res, next) => {
     const { email } = req.body;
     var user;
     if (isNaN(email)) {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 email: email,
+                active: true,
             },
         });
     } else {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 phoneNumber: email,
+                active: true,
             },
         });
     }
