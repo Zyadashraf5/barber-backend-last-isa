@@ -72,7 +72,7 @@ const sendEmail = async (options) => {
         secure: true,
         auth: {
             user: "salonbarber.dev@gmail.com",
-            pass: "16102000",
+            pass: "ljdlzvnizaimcawo",
         },
     });
 
