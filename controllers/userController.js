@@ -25,7 +25,7 @@ exports.getAbout = catchAsync(async (req, res, next) => {
 exports.sendSupport = catchAsync(async (req, res, next) => {
     const { email, name, message } = req.body;
     await sendEmail({
-        email: "salon.barber11@gmail.com",
+        email: "salonbarber.dev@gmail.com",
         subject: `Support (${email})`,
         name: name,
         message,
