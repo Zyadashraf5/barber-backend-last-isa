@@ -18,6 +18,24 @@ exports.changeBookingStatus = catchAsync(async (req, res, next) => {
         booking,
     });
 });
+exports.getBarberReviews = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const bookings = await prisma.booking.findMany({
+        where: {
+            barberStoreId: +id,
+            rating: {
+                not: null,
+            },
+            status: "Finished",
+        },
+        include: {
+            user: true,
+        },
+    });
+    res.status(200).json({
+        bookings,
+    });
+});
 exports.getMyClients = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const clients = await prisma.user.findMany({

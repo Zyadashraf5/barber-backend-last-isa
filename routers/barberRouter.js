@@ -6,6 +6,7 @@ const router = require("express").Router();
 // const upload = require('../utils/upload'); // Import the multer upload middleware
 
 router.use(authController.isLoggedIn);
+router.route("/reviews/:id").get(barberController.getBarberReviews);
 router
     .route("/me")
     .get(
