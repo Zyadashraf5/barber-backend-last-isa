@@ -137,7 +137,7 @@ model about{
     google     String?
     instagram String?
     whatsapp String?
-    desc     String?
+    desc     String?  @db.Text
     active Boolean      @default(true)
 
 
