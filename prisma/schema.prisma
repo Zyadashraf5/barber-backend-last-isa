@@ -16,8 +16,8 @@ datasource db {
 model user {
   id              Int           @id @unique @default(autoincrement())
   name            String
-  email           String?       @unique
-  phoneNumber     String?       @unique
+  email           String?       
+  phoneNumber     String?       
   password        String
   role            role          @default(User)
   created_at      DateTime      @default(now())
@@ -32,6 +32,7 @@ model user {
   favorite        favorite[]
   ban             Boolean       @default(false)
   packagePurchasedDate DateTime?
+  active          Boolean       @default(true)
 }
 model banner { 
     id              Int           @id @unique @default(autoincrement())
@@ -130,6 +131,16 @@ model booking {
   total            Decimal?     
   couponId         Int?             
   coupon           coupon?       @relation(fields: [couponId],references: [id])
+}
+model about{
+    id               Int                @id @unique @default(autoincrement())
+    google     String?
+    instagram String?
+    whatsapp String?
+    desc     String?
+    active Boolean      @default(true)
+
+
 }
 enum packageDuration {
   Annually

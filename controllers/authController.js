@@ -29,12 +29,14 @@ exports.register = catchAsync(async (req, res, next) => {
         exist = await prisma.user.findUnique({
             where: {
                 email: email,
+                active: true,
             },
         });
     } else {
         exist = await prisma.user.findUnique({
             where: {
                 phoneNumber: email,
+                active: true,
             },
         });
     }
@@ -78,6 +80,19 @@ exports.getMe = catchAsync(async (req, res, next) => {
     const user = await prisma.user.findUnique({
         where: {
             id: req.user.id,
+        },
+    });
+    res.status(200).json({
+        user,
+    });
+});
+exports.deleteMe = catchAsync(async (req, res, next) => {
+    const user = await prisma.user.update({
+        where: {
+            id: req.user.id,
+        },
+        data: {
+            active: false,
         },
     });
     res.status(200).json({
@@ -163,12 +178,14 @@ exports.login = catchAsync(async (req, res, next) => {
         user = await prisma.user.findUnique({
             where: {
                 email: email,
+                active: true,
             },
         });
     } else {
         user = await prisma.user.findUnique({
             where: {
                 phoneNumber: email,
+                active: true,
             },
         });
     }
@@ -176,6 +193,7 @@ exports.login = catchAsync(async (req, res, next) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
         return next(new AppError("incorrect data send!", 403));
     }
+
     if (user.status === "Pending") {
         await generateAndSendOTP(email, user.id, "Here is your OTP to Verfiy");
         return next(new AppError("please verify otp!", 403));

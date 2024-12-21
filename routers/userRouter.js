@@ -6,6 +6,8 @@ const router = require("express").Router();
 router.use(authController.isLoggedIn);
 router.route("/booking/all").get(userController.getAllBooking);
 router.route("/booking").get(userController.getMyBooking);
+router.route("/support").post(userController.sendSupport);
+router.route("/about").get(userController.getAbout);
 router
     .route("/booking/cancel/:id")
     .get(authController.restrictTo("User"), userController.cancelBooking);

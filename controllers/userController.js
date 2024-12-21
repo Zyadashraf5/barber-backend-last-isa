@@ -2,6 +2,8 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const sendEmail = require("../utils/email");
+
 exports.cancelBooking = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     let booking = await prisma.booking.update({
@@ -15,6 +17,20 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
     res.status(200).json({
         booking,
     });
+});
+exports.getAbout = catchAsync(async (req, res, next) => {
+    const about = await prisma.about.findFirst({});
+    res.status(200).json({ about });
+});
+exports.sendSupport = catchAsync(async (req, res, next) => {
+    const { email, name, message } = req.body;
+    await sendEmail({
+        email: "salon.barber11@gmail.com",
+        subject: `Support (${email})`,
+        name: name,
+        message,
+    });
+    res.status(200).json({});
 });
 exports.checkCoupon = catchAsync(async (req, res, next) => {
     const { code } = req.body;
