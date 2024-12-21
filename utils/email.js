@@ -71,8 +71,8 @@ const sendEmail = async (options) => {
         port: 465, // Secure SMTP port
         secure: true,
         auth: {
-            user: "salon.barber11@gmail.com",
-            pass: "wivwbkkohnjhgkqo",
+            user: "salonbarber.dev@gmail.com",
+            pass: "16102000",
         },
     });
 
@@ -83,9 +83,9 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: 'Salon <salon.barber11@gmail.com>', 
-        to: options.email, 
-        subject: options.subject, 
+        from: "Salon <salon.barber11@gmail.com>",
+        to: options.email,
+        subject: options.subject,
         html: htmlContent, // Use the HTML template
     };
 
