@@ -342,15 +342,17 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     const { email, otp, password } = req.body;
     var user;
     if (isNaN(email)) {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 email,
+                active: true,
             },
         });
     } else {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 phoneNumber: email,
+                active: true,
             },
         });
     }
@@ -403,15 +405,17 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
 
     var user;
     if (isNaN(email)) {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 email,
+                active: true,
             },
         });
     } else {
-        user = await prisma.user.findUnique({
+        user = await prisma.user.findFirst({
             where: {
                 phoneNumber: email,
+                active: true,
             },
         });
     }
