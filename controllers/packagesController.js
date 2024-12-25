@@ -24,33 +24,35 @@ exports.buyPackage = catchAsync(async (req, res, next) => {
         },
     });
 });
-exports.subscribe = catchAsync(async (req, res, next) => {
+exports.subscribe = async (req, res) => {
     const { id } = req.params;
-    const package = await prisma.packages.findUnique({
-        where: {
-            id: +id,
-        },
-    });
-    const user = await prisma.user.findUnique({
-        where: {
-            id: +req.user.id,
-        },
-    });
-
-    const payload = {
-        InvoiceValue: package.price,
-        CustomerName: user.name,
-        CustomerMobile: user.phoneNumber,
-        CustomerEmail: user.email,
-        CallBackUrl: "http://localhost:3000/subscription-success",
-        ErrorUrl: "http://localhost:3000/subscription-error",
-        Language: "EN",
-    };
 
     try {
-        // Step 1: Initiate Payment
-        const paymentResponse = await axios.post(
-            `${BASE_URL}/v2/InitiatePayment`,
+        // Fetch package and user details
+        const package = await prisma.packages.findUnique({
+            where: { id: +id },
+        });
+        const user = await prisma.user.findUnique({
+            where: { id: +req.user.id },
+        });
+
+        const payload = {
+            InvoiceValue: package.price,
+            CustomerName: user.name,
+            CustomerMobile: user.phoneNumber,
+            CustomerEmail: user.email,
+            CallBackUrl: "http://localhost:3000/subscription-success",
+            ErrorUrl: "http://localhost:3000/subscription-error",
+            Language: "EN",
+            RecurringModel: {
+                RecurringType: package.duration, // Daily, Weekly, Monthly
+                RecurringInterval: 1, // e.g., every 1 month
+                RecurringCount: 12, // Optional, specify the total number of payments
+            },
+        };
+
+        const response = await axios.post(
+            `${BASE_URL}/v2/SendPayment`,
             payload,
             {
                 headers: {
@@ -60,45 +62,20 @@ exports.subscribe = catchAsync(async (req, res, next) => {
             }
         );
 
-        const paymentMethodId =
-            paymentResponse.data.Data.PaymentMethods[0].PaymentMethodId;
+        const subscriptionUrl = response.data.Data.InvoiceURL;
 
-        // Step 2: Create Recurring Invoice
-        const recurringPayload = {
-            PaymentMethodId: paymentMethodId,
-            RecurringType: package.duration, // e.g., "Daily", "Weekly", "Monthly"
-            RecurringInterval: 1, // Interval in days/weeks/months
-            InvoiceValue: package.price,
-            CustomerName: user.name,
-            CustomerMobile: user.phoneNumber,
-            CustomerEmail: user.email,
-            CallBackUrl: "http://localhost:3000/subscription-success",
-            ErrorUrl: "http://localhost:3000/subscription-error",
-            Language: "EN",
-        };
-
-        const recurringResponse = await axios.post(
-            `${BASE_URL}/v2/CreateSubscription`,
-            recurringPayload,
-            {
-                headers: {
-                    Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-
-        const subscriptionUrl = recurringResponse.data.Data.InvoiceURL;
-        res.status(200).json({
-            url: subscriptionUrl,
-        });
+        // Send the subscription URL to the client
+        res.status(200).json({ url: subscriptionUrl });
     } catch (error) {
-        console.error("Subscription Error:", error.response?.data || error);
+        console.error(
+            "Subscription Error:",
+            error.response?.data || error.message
+        );
         res.status(500).send(
             "Failed to initiate subscription. Please try again."
         );
     }
-});
+};
 exports.getAllPackages = catchAsync(async (req, res, next) => {
     const packages = await prisma.packages.findMany({});
     res.status(200).json({
