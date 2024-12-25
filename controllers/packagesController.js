@@ -109,7 +109,7 @@ exports.subResultSuccess = catchAsync(async (req, res, next) => {
         data: {
             barberPackage: {
                 connect: {
-                    id: packageId,
+                    id: +packageId,
                 },
             },
         },
