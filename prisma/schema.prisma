@@ -131,6 +131,7 @@ model booking {
   total            Decimal?     
   couponId         Int?             
   coupon           coupon?       @relation(fields: [couponId],references: [id])
+  paymentId        String?
 }
 model about{
     id               Int                @id @unique @default(autoincrement())

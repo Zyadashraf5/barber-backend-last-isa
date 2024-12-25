@@ -18,6 +18,160 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
         booking,
     });
 });
+exports.checkPayment = catchAsync(async (req, res, next) => {
+    const { bookingId } = req.body;
+    const booking = await prisma.booking.findUnique({
+        where: {
+            id: +bookingId,
+        },
+    });
+    const response = await axios.post(
+        `${BASE_URL}/v2/GetPaymentStatus`,
+        {
+            Key: booking.paymentId,
+            KeyType: "PaymentId", // Indicates you're searching by PaymentId
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+        }
+    );
+
+    const paymentStatus = response.data.Data;
+    console.log("Payment Status:", paymentStatus);
+    res.status(200).json({
+        status: paymentStatus,
+    });
+});
+exports.subscribe = async (req, res) => {
+    const { id } = req.params; // Get package ID from request parameters
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: +req.user.id },
+        });
+
+        // Step 1: Call InitiatePayment to get valid PaymentMethodId
+        const initiateResponse = await axios.post(
+            `${BASE_URL}/v2/InitiatePayment`,
+            {
+                InvoiceAmount: req.booking.total, // Package price
+                CurrencyIso: "KWD", // Use your account's currency
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        // Retrieve the first valid PaymentMethodId
+        const paymentMethodId =
+            initiateResponse.data.Data.PaymentMethods[0].PaymentMethodId;
+
+        // Step 2: Prepare payload for SendPayment
+        const payload = {
+            InvoiceValue: req.booking.total,
+            CustomerName: user.name,
+            CustomerMobile: user.phoneNumber,
+            CustomerEmail: user.email,
+            CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/users/success?userId=${user.id}&bookingId=${req.booking.id}`,
+            ErrorUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/users/fail?bookingId=${req.booking.id}`,
+            Language: "EN",
+            NotificationOption: "ALL",
+            PaymentMethodId: paymentMethodId, // Use valid PaymentMethodId
+        };
+
+        // Step 3: Call SendPayment to initiate subscription
+        const response = await axios.post(
+            `${BASE_URL}/v2/SendPayment`,
+            payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const subscriptionUrl = response.data.Data.InvoiceURL;
+
+        // Send the subscription URL to the client
+        res.status(200).json({ url: subscriptionUrl, booking: req.booking });
+    } catch (error) {
+        console.error(
+            "Subscription Error:",
+            error.response?.data || error.message
+        );
+        res.status(500).send(
+            "Failed to initiate subscription. Please try again."
+        );
+    }
+};
+exports.subResultSuccess = catchAsync(async (req, res, next) => {
+    const { bookingId, userId } = req.query;
+    await prisma.booking.update({
+        where: {
+            id: +bookingId,
+        },
+        data: {
+            status: "Booked",
+            paymentId: req.query.paymentId,
+            paymentType: "Card",
+        },
+    });
+    res.status(200).send("<div><h1>success , return to the app</h1></div>");
+});
+exports.subResultFail = catchAsync(async (req, res, next) => {
+    const paymentId = req.query.paymentId; // Extract paymentId from query parameters
+    const { bookingId } = req.query;
+    if (!paymentId) {
+        res.status(400).send("Missing paymentId in query parameters.");
+        return;
+    }
+
+    try {
+        // Fetch payment status using the paymentId
+        const response = await axios.post(
+            `${BASE_URL}/v2/GetPaymentStatus`,
+            {
+                Key: paymentId,
+                KeyType: "PaymentId", // Indicates you're searching by PaymentId
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const paymentStatus = response.data.Data;
+        console.log("Payment Status:", paymentStatus);
+        console.log(response.data);
+        await prisma.booking.update({
+            where: {
+                id: +bookingId,
+            },
+            data: {
+                status: "Canceled",
+                paymentId: req.query.paymentId,
+                paymentType: "Card",
+            },
+        });
+        // Handle failed payment status here
+        res.status(200).send("<div><h1>Failed , try again later</h1></div>");
+    } catch (error) {
+        console.error(
+            "Error Fetching Payment Status:",
+            error.response?.data || error.message
+        );
+        res.status(500).send("Unable to fetch payment status.");
+    }
+});
 exports.getAbout = catchAsync(async (req, res, next) => {
     const about = await prisma.about.findFirst({
         where: {
@@ -219,7 +373,7 @@ exports.addFavorite = catchAsync(async (req, res, next) => {
 exports.book = catchAsync(async (req, res, next) => {
     const { id } = req.params;
 
-    let { servicesId, date, paymentType, code } = req.body;
+    let { servicesId, date, paymentType, code, paymentMethod } = req.body;
     const { lat, lng } = req.query;
     date = new Date(date.replace(" ", "T") + "Z");
     const services = await prisma.barber_service.findMany({
@@ -299,10 +453,10 @@ exports.book = catchAsync(async (req, res, next) => {
         lat,
         lng
     );
-
-    res.status(200).json({
-        booking,
-    });
+    req.booking = booking;
+    if (paymentMethod === "Card") {
+        this.subscribe(req, res);
+    }
 });
 exports.getMyBooking = catchAsync(async (req, res, next) => {
     const { lat, lng } = req.query;
