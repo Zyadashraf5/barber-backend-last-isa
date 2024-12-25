@@ -95,7 +95,42 @@ exports.subResultSuccess = catchAsync(async (req, res, next) => {
     );
 });
 exports.subResultFail = catchAsync(async (req, res, next) => {
-    res.status(200).send("<div><h1>Failed , try again later</h1></div>");
+    const paymentId = req.query.paymentId; // Extract paymentId from query parameters
+
+    if (!paymentId) {
+        res.status(400).send("Missing paymentId in query parameters.");
+        return;
+    }
+
+    try {
+        // Fetch payment status using the paymentId
+        const response = await axios.post(
+            `${BASE_URL}/v2/GetPaymentStatus`,
+            {
+                Key: paymentId,
+                KeyType: "PaymentId", // Indicates you're searching by PaymentId
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const paymentStatus = response.data.Data;
+        console.log("Payment Status:", paymentStatus);
+        console.log(response.data);
+
+        // Handle failed payment status here
+        res.status(200).send("<div><h1>Failed , try again later</h1></div>");
+    } catch (error) {
+        console.error(
+            "Error Fetching Payment Status:",
+            error.response?.data || error.message
+        );
+        res.status(500).send("Unable to fetch payment status.");
+    }
 });
 exports.getAllPackages = catchAsync(async (req, res, next) => {
     const packages = await prisma.packages.findMany({});
