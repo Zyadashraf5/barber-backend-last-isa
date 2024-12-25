@@ -46,6 +46,9 @@ exports.subscribe = async (req, res) => {
                 "https://coral-app-3s2ln.ondigitalocean.app/api/packages/fail",
             Language: "EN",
             NotificationOption: "ALL",
+            RecurringModel: {
+                RecurringType: "Monthly", // Daily, Weekly, Monthly
+            },
         };
 
         const response = await axios.post(
