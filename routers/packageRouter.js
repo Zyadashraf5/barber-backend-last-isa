@@ -12,6 +12,9 @@ router
         packageController.createPackage
     )
     .get(packageController.getAllPackages);
+router.route("/success").get(packageController.subResultSuccess);
+router.route("/fail").get(packageController.subResultFail);
+
 router.post("/start-subscription/:id", packageController.subscribe);
 router.route("/buy").post(packageController.buyPackage);
 module.exports = router;

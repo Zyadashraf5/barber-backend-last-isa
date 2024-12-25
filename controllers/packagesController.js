@@ -41,8 +41,9 @@ exports.subscribe = async (req, res) => {
             CustomerName: user.name,
             CustomerMobile: user.phoneNumber,
             CustomerEmail: user.email,
-            CallBackUrl: "http://localhost:3000/subscription-success",
-            ErrorUrl: "http://localhost:3000/subscription-error",
+            CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/packages/success?id=${user.id}&packageId=${package.id}`,
+            ErrorUrl:
+                "https://coral-app-3s2ln.ondigitalocean.app/api/packages/fail",
             Language: "EN",
             NotificationOption: "ALL",
             RecurringModel: {
@@ -77,6 +78,27 @@ exports.subscribe = async (req, res) => {
         );
     }
 };
+exports.subResultSuccess = catchAsync(async (req, res, next) => {
+    const { packageId, id } = req.query;
+    await prisma.user.update({
+        where: {
+            id: +id,
+        },
+        data: {
+            barberPackage: {
+                connect: {
+                    id: packageId,
+                },
+            },
+        },
+    });
+    res.status(200).send(
+        "<div><h1>success , return to the app and relogin to access it</h1></div>"
+    );
+});
+exports.subResultFail = catchAsync(async (req, res, next) => {
+    res.status(200).send("<div><h1>Failed , try again later</h1></div>");
+});
 exports.getAllPackages = catchAsync(async (req, res, next) => {
     const packages = await prisma.packages.findMany({});
     res.status(200).json({
