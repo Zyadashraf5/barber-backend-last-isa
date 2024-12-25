@@ -455,7 +455,7 @@ exports.book = catchAsync(async (req, res, next) => {
     );
     req.booking = booking;
     if (paymentMethod === "Card") {
-        this.subscribe(req, res);
+        await this.subscribe(req, res);
     }
 });
 exports.getMyBooking = catchAsync(async (req, res, next) => {
