@@ -25,7 +25,7 @@ exports.buyPackage = catchAsync(async (req, res, next) => {
     });
 });
 exports.subscribe = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; // Get package ID from request parameters
 
     try {
         // Fetch package and user details
@@ -36,6 +36,26 @@ exports.subscribe = async (req, res) => {
             where: { id: +req.user.id },
         });
 
+        // Step 1: Call InitiatePayment to get valid PaymentMethodId
+        const initiateResponse = await axios.post(
+            `${BASE_URL}/v2/InitiatePayment`,
+            {
+                InvoiceAmount: package.price, // Package price
+                CurrencyIso: "KWD", // Use your account's currency
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${MYFATOORAH_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        // Retrieve the first valid PaymentMethodId
+        const paymentMethodId =
+            initiateResponse.data.Data.PaymentMethods[0].PaymentMethodId;
+
+        // Step 2: Prepare payload for SendPayment
         const payload = {
             InvoiceValue: package.price,
             CustomerName: user.name,
@@ -46,11 +66,15 @@ exports.subscribe = async (req, res) => {
                 "https://coral-app-3s2ln.ondigitalocean.app/api/packages/fail",
             Language: "EN",
             NotificationOption: "ALL",
+            PaymentMethodId: paymentMethodId, // Use valid PaymentMethodId
             RecurringModel: {
                 RecurringType: "Monthly", // Daily, Weekly, Monthly
+                RecurringInterval: 1, // Interval in months
+                RecurringCount: 12, // Optional: Number of recurring payments
             },
         };
 
+        // Step 3: Call SendPayment to initiate subscription
         const response = await axios.post(
             `${BASE_URL}/v2/SendPayment`,
             payload,
