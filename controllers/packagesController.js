@@ -1,6 +1,8 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const { PrismaClient } = require("@prisma/client");
+const axios = require("axios");
+
 const prisma = new PrismaClient();
 exports.buyPackage = catchAsync(async (req, res, next) => {
     const { packageId } = req.body;
@@ -17,7 +19,7 @@ exports.buyPackage = catchAsync(async (req, res, next) => {
         },
     });
 });
-exports.subscribe = catchAsync(async (req, res,res) => {
+exports.subscribe = catchAsync(async (req, res,next) => {
     const { id } = req.params;
     const package = await prisma.packages.findUnique({
         where:{
