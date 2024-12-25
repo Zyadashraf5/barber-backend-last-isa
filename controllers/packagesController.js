@@ -78,7 +78,7 @@ exports.subscribe = catchAsync(async (req, res, next) => {
         };
 
         const recurringResponse = await axios.post(
-            `${BASE_URL}/v2/RecurringInvoice`,
+            `${BASE_URL}/v2/CreateSubscription`,
             recurringPayload,
             {
                 headers: {
