@@ -402,7 +402,7 @@ exports.book = catchAsync(async (req, res, next) => {
             data: {
                 barberStoreId: +id,
                 userId: +req.user.id,
-                Date: date,
+                Date: new Date(),
                 paymentType,
                 total,
                 couponId: coupon.id,
