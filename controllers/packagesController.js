@@ -44,6 +44,7 @@ exports.subscribe = async (req, res) => {
             CallBackUrl: "http://localhost:3000/subscription-success",
             ErrorUrl: "http://localhost:3000/subscription-error",
             Language: "EN",
+            NotificationOption: "ALL",
             RecurringModel: {
                 RecurringType: package.duration, // Daily, Weekly, Monthly
                 RecurringInterval: 1, // e.g., every 1 month
