@@ -112,6 +112,7 @@ exports.subResultSuccess = catchAsync(async (req, res, next) => {
                     id: +packageId,
                 },
             },
+            packagePurchasedDate: new Date(),
         },
     });
     res.status(200).send(
