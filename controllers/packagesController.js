@@ -6,7 +6,8 @@ const axios = require("axios");
 const prisma = new PrismaClient();
 const MYFATOORAH_API_KEY =
     "XdwZeGb7LV18bbM1jS7URJ8MB-9gsfvJdwW6Dm5at-skZhMmIQlgU5Qtd-NgtyXGpPH42gRhtP9Aom4P9qxhh9ZBKPg1brO84itxUmgi_HYJQu0dHOON6mKN0qmHkbYHI9tiXzld8d4trM0AK-2Kuu-j-PUp9SljPsdy2b7QKDIrqKs48Q90l6cBw88SJlOkmuu2TvgajdJ5e_fIeMX241OoPcN8d6EdrjqjAS63YTPIAUNymSMj7OmTmIxXhvXttyPGUaw3UUabZB_dn5SLeKC4-4B_j7plIvwI39Y5MJXAGZ57ANZkqlzUAuo7bxDo6djel7kJgk00kInlR6DVD6eqUpMKqP6fuyzqnM-FK7hmLdAN66U9gFPXZSIOcvRNU0HNTFtTBvB2SFvDnCppBXMlGQTgx5egWt767Z2vM3Z7PYuoq_2OuEqm2_SkaEq0ll6CT1Y9PlaP3j3A2DXMll-RTVunSNi0vLGNBgRwOPSjmtplwp8AraaG14KrKeprLq3ePVwbaS6TdFSLTlPeFr_ytlT2sNAkcWXQVwGpel03mB9Ilg1jOkdzEKsKac1cGe-q8eyxVqYyhTS94__kQxQqRHezsABO6o_QqChmIqr810un0yCWua3plO-AQ1NDhtusDQmHl6ct7KyIsF5dqPVUYdyRzJbm1nlnAVueIio9jOXKCc5T6p0eNMf6kZ1aB9tE_A";
-const BASE_URL = "https://api.myfatoorah.com";
+// const BASE_URL = "https://api.myfatoorah.com";
+const BASE_URL = "https://apitest.myfatoorah.com";
 //
 exports.buyPackage = catchAsync(async (req, res, next) => {
     const { packageId } = req.body;
