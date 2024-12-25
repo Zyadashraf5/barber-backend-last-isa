@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const axios = require("axios");
 
 const prisma = new PrismaClient();
+//
 exports.buyPackage = catchAsync(async (req, res, next) => {
     const { packageId } = req.body;
     await prisma.user.update({
