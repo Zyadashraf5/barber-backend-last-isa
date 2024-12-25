@@ -406,6 +406,7 @@ exports.book = catchAsync(async (req, res, next) => {
             data: {
                 barberStoreId: +id,
                 userId: +req.user.id,
+                status: "Canceled",
                 Date: new Date(),
                 paymentType,
                 total,
@@ -417,6 +418,7 @@ exports.book = catchAsync(async (req, res, next) => {
             data: {
                 barberStoreId: +id,
                 userId: +req.user.id,
+                status: "Canceled",
                 Date: new Date(),
                 paymentType,
                 total,
