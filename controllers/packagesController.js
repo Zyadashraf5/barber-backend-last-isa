@@ -61,7 +61,7 @@ exports.subscribe = async (req, res) => {
             CustomerName: user.name,
             CustomerMobile: user.phoneNumber,
             CustomerEmail: user.email,
-            CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/packages/success?id=${user.id}&packageId=${package.id}`,
+            CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/packages/success?userId=${user.id}&packageId=${package.id}`,
             ErrorUrl:
                 "https://coral-app-3s2ln.ondigitalocean.app/api/packages/fail",
             Language: "EN",
@@ -101,10 +101,10 @@ exports.subscribe = async (req, res) => {
     }
 };
 exports.subResultSuccess = catchAsync(async (req, res, next) => {
-    const { packageId, id } = req.query;
+    const { packageId, userId } = req.query;
     await prisma.user.update({
         where: {
-            id: +id,
+            id: +userId,
         },
         data: {
             barberPackage: {
