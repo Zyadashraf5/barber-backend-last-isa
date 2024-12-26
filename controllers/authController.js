@@ -106,10 +106,10 @@ exports.changePassword = catchAsync(async (req, res, next) => {
             id: req.user.id,
         },
     });
-    if (!user || !bcrypt.compare(oldPassword, user.password)) {
+    if (!user || !(await bcrypt.compare(oldPassword, user.password))) {
         return next(new AppError("Wrong data Sent!", 400));
     }
-    const hash = bcrypt.hash(newPassword, 12);
+    const hash = await bcrypt.hash(newPassword, 12);
     user = await prisma.user.update({
         where: {
             id: user.id,
