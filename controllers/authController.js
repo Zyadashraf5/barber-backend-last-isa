@@ -86,6 +86,19 @@ exports.getMe = catchAsync(async (req, res, next) => {
         user,
     });
 });
+exports.editMe = catchAsync(async (req, res, next) => {
+    const user = await prisma.user.update({
+        where: {
+            id: req.user.id,
+        },
+        data:{
+            ...req.body
+        }
+    });
+    res.status(200).json({
+        user,
+    });
+});
 exports.deleteMe = catchAsync(async (req, res, next) => {
     const user = await prisma.user.update({
         where: {
