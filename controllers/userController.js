@@ -404,6 +404,7 @@ exports.book = catchAsync(async (req, res, next) => {
         total *= total * coupon.discount;
     }
     let booking;
+
     if (coupon) {
         booking = await prisma.booking.create({
             data: {
@@ -464,6 +465,21 @@ exports.book = catchAsync(async (req, res, next) => {
     );
     req.booking = booking;
     if (paymentMethod === "Card") {
+        const store = await prisma.barberStore.findUnique({
+            where: {
+                id: +id,
+            },
+        });
+        await prisma.user.update({
+            where: {
+                id: +store.userId,
+            },
+            data: {
+                wallet: {
+                    increment: total,
+                },
+            },
+        });
         await this.subscribe(req, res);
     }
 });

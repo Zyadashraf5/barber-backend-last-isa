@@ -33,6 +33,7 @@ model user {
   ban             Boolean       @default(false)
   packagePurchasedDate DateTime?
   active          Boolean       @default(true)
+  wallet          Decimal       @default(0.0)
 }
 model banner { 
     id              Int           @id @unique @default(autoincrement())
