@@ -59,7 +59,10 @@ exports.subscribe = async (req, res) => {
         const payload = {
             InvoiceValue: package.price,
             CustomerName: user.name,
-            CustomerMobile: user.phoneNumber,
+            CustomerMobile: user.phoneNumber.replace(/^(\+?\d{1,3})/, ""), // Removes country code from phone number
+            CustomerCountryCode: user.phoneNumber
+                .match(/^\+?\d{1,3}/)[0]
+                .replace("+", ""), // Extracts country code
             CustomerEmail: user.email,
             CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/packages/success?userId=${user.id}&packageId=${package.id}`,
             ErrorUrl:
