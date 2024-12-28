@@ -4,6 +4,18 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const sendEmail = require("../utils/email");
 const axios = require("axios");
+const { parsePhoneNumber } = require("libphonenumber-js");
+const parsePhone = (phoneNumber) => {
+    try {
+        const parsed = parsePhoneNumber(phoneNumber);
+        return {
+            countryCode: parsed.countryCallingCode, // Extracts the country code
+            localNumber: parsed.nationalNumber, // Extracts the local part
+        };
+    } catch (error) {
+        throw new Error("Invalid phone number format");
+    }
+};
 const MYFATOORAH_API_KEY =
     "rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL";
 // const BASE_URL = "https://api.myfatoorah.com";
@@ -75,15 +87,13 @@ exports.subscribe = async (req, res) => {
         // Retrieve the first valid PaymentMethodId
         const paymentMethodId =
             initiateResponse.data.Data.PaymentMethods[0].PaymentMethodId;
-
+        const { countryCode, localNumber } = parsePhone(user.phoneNumber);
         // Step 2: Prepare payload for SendPayment
         const payload = {
             InvoiceValue: req.booking.total,
             CustomerName: user.name,
-            CustomerMobile: user.phoneNumber.replace(/^(\+?\d{1,3})/, ""), // Removes country code from phone number
-            CustomerCountryCode: user.phoneNumber
-                .match(/^\+?\d{1,3}/)[0]
-                .replace("+", ""), // Extracts country code
+            CustomerMobile: localNumber,
+            CustomerCountryCode: countryCode,
             CustomerEmail: user.email,
             CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/users/success?userId=${user.id}&bookingId=${req.booking.id}`,
             ErrorUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/users/fail?bookingId=${req.booking.id}`,

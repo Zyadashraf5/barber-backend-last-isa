@@ -24,6 +24,18 @@ exports.buyPackage = catchAsync(async (req, res, next) => {
         },
     });
 });
+const { parsePhoneNumber } = require("libphonenumber-js");
+const parsePhone = (phoneNumber) => {
+    try {
+        const parsed = parsePhoneNumber(phoneNumber);
+        return {
+            countryCode: parsed.countryCallingCode, // Extracts the country code
+            localNumber: parsed.nationalNumber, // Extracts the local part
+        };
+    } catch (error) {
+        throw new Error("Invalid phone number format");
+    }
+};
 exports.subscribe = async (req, res) => {
     const { id } = req.params; // Get package ID from request parameters
 
@@ -54,15 +66,14 @@ exports.subscribe = async (req, res) => {
         // Retrieve the first valid PaymentMethodId
         const paymentMethodId =
             initiateResponse.data.Data.PaymentMethods[0].PaymentMethodId;
+        const { countryCode, localNumber } = parsePhone(user.phoneNumber);
 
         // Step 2: Prepare payload for SendPayment
         const payload = {
             InvoiceValue: package.price,
             CustomerName: user.name,
-            CustomerMobile: user.phoneNumber.replace(/^(\+?\d{1,3})/, ""), // Removes country code from phone number
-            CustomerCountryCode: user.phoneNumber
-                .match(/^\+?\d{1,3}/)[0]
-                .replace("+", ""), // Extracts country code
+            CustomerMobile: localNumber,
+            CustomerCountryCode: countryCode,
             CustomerEmail: user.email,
             CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/packages/success?userId=${user.id}&packageId=${package.id}`,
             ErrorUrl:
