@@ -80,7 +80,10 @@ exports.subscribe = async (req, res) => {
         const payload = {
             InvoiceValue: req.booking.total,
             CustomerName: user.name,
-            CustomerMobile: user.phoneNumber,
+            CustomerMobile: user.phoneNumber.replace(/^(\+?\d{1,3})/, ""), // Removes country code from phone number
+            CustomerCountryCode: user.phoneNumber
+                .match(/^\+?\d{1,3}/)[0]
+                .replace("+", ""), // Extracts country code
             CustomerEmail: user.email,
             CallBackUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/users/success?userId=${user.id}&bookingId=${req.booking.id}`,
             ErrorUrl: `https://coral-app-3s2ln.ondigitalocean.app/api/users/fail?bookingId=${req.booking.id}`,
