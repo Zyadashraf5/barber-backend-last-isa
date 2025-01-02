@@ -238,8 +238,8 @@ exports.finishBooking = catchAsync(async (req, res, next) => {
 exports.getBookingByDate = catchAsync(async (req, res, next) => {
     const { date } = req.query;
     const { id } = req.params;
-    let currentDate = new Date(date.replace(" ", "T") + "Z");
-    let datePlusDay = new Date(date.replace(" ", "T") + "Z");
+    let currentDate = new Date(date);
+    let datePlusDay = new Date(date);
     datePlusDay.setDate(datePlusDay.getDate() + 1);
     console.log(currentDate, datePlusDay);
     const booking = await prisma.booking.findMany({
@@ -392,9 +392,7 @@ exports.book = catchAsync(async (req, res, next) => {
 
     let { servicesId, date, paymentType, code, paymentMethod } = req.body;
     const { lat, lng } = req.query;
-    date = new Date(date.replace(" ", "T") + "Z");
-    console.log(date);
-
+    date = new Date(date);
     const services = await prisma.barber_service.findMany({
         where: {
             id: {
