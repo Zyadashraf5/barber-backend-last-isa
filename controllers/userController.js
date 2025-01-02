@@ -491,6 +491,10 @@ exports.book = catchAsync(async (req, res, next) => {
             },
         });
         await this.subscribe(req, res);
+    } else {
+        res.status(200).json({
+            booking,
+        });
     }
 });
 exports.getMyBooking = catchAsync(async (req, res, next) => {
