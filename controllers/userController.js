@@ -475,6 +475,8 @@ exports.book = catchAsync(async (req, res, next) => {
     );
     req.booking = booking;
     if (paymentMethod === "Card") {
+        console.log("card");
+
         const store = await prisma.barberStore.findUnique({
             where: {
                 id: +id,
@@ -492,6 +494,8 @@ exports.book = catchAsync(async (req, res, next) => {
         });
         await this.subscribe(req, res);
     } else {
+        console.log("cash");
+
         res.status(200).json({
             booking,
         });
