@@ -393,6 +393,8 @@ exports.book = catchAsync(async (req, res, next) => {
     let { servicesId, date, paymentType, code, paymentMethod } = req.body;
     const { lat, lng } = req.query;
     date = new Date(date.replace(" ", "T") + "Z");
+    console.log(date);
+
     const services = await prisma.barber_service.findMany({
         where: {
             id: {
