@@ -420,7 +420,7 @@ exports.book = catchAsync(async (req, res, next) => {
             data: {
                 barberStoreId: +id,
                 userId: +req.user.id,
-                status: "Canceled",
+                status: "Booked",
                 Date: new Date(),
                 paymentType,
                 total,
@@ -432,7 +432,7 @@ exports.book = catchAsync(async (req, res, next) => {
             data: {
                 barberStoreId: +id,
                 userId: +req.user.id,
-                status: "Canceled",
+                status: "Booked",
                 Date: new Date(),
                 paymentType,
                 total,
@@ -476,7 +476,14 @@ exports.book = catchAsync(async (req, res, next) => {
     req.booking = booking;
     if (paymentMethod === "Card") {
         console.log("card");
-
+        await prisma.booking.update({
+            where: {
+                id: booking.id,
+            },
+            data: {
+                status: "Canceled",
+            },
+        });
         const store = await prisma.barberStore.findUnique({
             where: {
                 id: +id,
