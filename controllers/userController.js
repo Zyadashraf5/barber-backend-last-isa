@@ -71,6 +71,7 @@ exports.checkPayment = catchAsync(async (req, res, next) => {
     console.log("Payment Status:", paymentStatus);
     res.status(200).json({
         status: paymentStatus,
+        booking: req.booking,
     });
 });
 exports.subscribe = async (req, res) => {
