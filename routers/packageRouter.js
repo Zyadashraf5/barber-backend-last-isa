@@ -17,4 +17,10 @@ router
 
 router.post("/start-subscription/:id", packageController.subscribe);
 router.route("/buy").post(packageController.buyPackage);
+router
+    .route("/:id")
+    .delete(
+        authController.restrictTo("Admin"),
+        packageController.deletePackage
+    );
 module.exports = router;

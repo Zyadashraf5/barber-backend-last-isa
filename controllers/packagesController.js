@@ -36,6 +36,18 @@ const parsePhone = (phoneNumber) => {
         throw new Error("Invalid phone number format");
     }
 };
+exports.deletePackage = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const package = await prisma.packages.delete({
+        where: {
+            id: +id,
+        },
+    });
+    res.status(204).json({
+        package,
+    });
+});
+
 exports.subscribe = async (req, res) => {
     const { id } = req.params; // Get package ID from request parameters
 
