@@ -65,13 +65,22 @@ exports.checkPayment = catchAsync(async (req, res, next) => {
             data: {
                 status: "Booked",
             },
+            include: {
+                barberStore: true,
+                booking_services: {
+                    include: {
+                        service: true,
+                    },
+                },
+                user: true,
+            },
         });
     }
 
     console.log("Payment Status:", paymentStatus);
     res.status(200).json({
         status: paymentStatus,
-        booking: req.booking,
+        booking: booking,
     });
 });
 exports.subscribe = async (req, res) => {
