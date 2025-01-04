@@ -55,7 +55,8 @@ exports.checkPayment = catchAsync(async (req, res, next) => {
         }
     );
 
-    const paymentStatus = response.data.Data;
+    const paymentStatus =
+        response.data.Data.InvoiceTransactions.TransactionStatus;
     console.log("Payment Status:", paymentStatus);
     res.status(200).json({
         status: paymentStatus,
