@@ -56,8 +56,18 @@ exports.checkPayment = catchAsync(async (req, res, next) => {
     );
     console.log(response.data);
 
-    const paymentStatus =
-        response.data.Data.InvoiceTransactions.TransactionStatus;
+    const paymentStatus = response.data.Data.InvoiceStatus;
+    if (paymentStatus === "Paid") {
+        await prisma.booking.update({
+            where: {
+                id: +bookingId,
+            },
+            data: {
+                status: "Booked",
+            },
+        });
+    }
+
     console.log("Payment Status:", paymentStatus);
     res.status(200).json({
         status: paymentStatus,
