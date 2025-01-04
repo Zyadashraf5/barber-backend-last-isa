@@ -105,7 +105,7 @@ model packages {
   smallDesc String ?
   desc      String ?
   type String ?
-  duration packageDuration @default(Annually)
+  duration packageDuration @default(Monthly)
   user  user[]
 }
 model coupon{

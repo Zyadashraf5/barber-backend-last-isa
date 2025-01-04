@@ -411,7 +411,7 @@ exports.book = catchAsync(async (req, res, next) => {
         });
     }
 
-    let total = services.reduce((sum, element) => sum + element.price, 0);
+    let total = services.reduce((sum, element) => +sum + +element.price, 0);
     if (coupon) {
         total *= total * coupon.discount;
     }
