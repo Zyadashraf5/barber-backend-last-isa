@@ -126,6 +126,17 @@ exports.getAllBanners = catchAsync(async (req, res, next) => {
         banners,
     });
 });
+exports.deleteBanner = catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const banner = await prisma.banner.delete({
+        where: {
+            id: +id,
+        },
+    });
+    res.status(204).json({
+        banner,
+    });
+});
 exports.toggleBanner = catchAsync(async (req, res, next) => {
     let banner = await prisma.banner.findUnique({
         where: {

@@ -31,6 +31,9 @@ router
     .route("/banner/toggle/:id")
     .get(authController.restrictTo("Admin"), adminController.toggleBanner);
 router
+    .route("/banner/:id")
+    .delete(authController.restrictTo("Admin"), adminController.deleteBanner);
+router
     .route("/banners")
     .get(authController.restrictTo("Admin"), adminController.getAllBanners)
     .post(

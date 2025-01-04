@@ -90,7 +90,7 @@ exports.subscribe = async (req, res) => {
         const { countryCode, localNumber } = parsePhone(user.phoneNumber);
         // Step 2: Prepare payload for SendPayment
         const payload = {
-            InvoiceValue: req.booking.total,
+            InvoiceValue: +req.booking.total,
             CustomerName: user.name,
             CustomerMobile: localNumber,
             CustomerCountryCode: countryCode,
@@ -415,6 +415,8 @@ exports.book = catchAsync(async (req, res, next) => {
     if (coupon) {
         total *= total * coupon.discount;
     }
+    console.log(total);
+
     let booking;
 
     if (coupon) {
