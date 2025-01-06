@@ -18,7 +18,8 @@ model user {
   name            String
   email           String?       
   phoneNumber     String?       
-  password        String
+  password        String?
+  google          Boolean       @default(false)
   role            role          @default(User)
   created_at      DateTime      @default(now())
   status          user_status   @default(Pending)

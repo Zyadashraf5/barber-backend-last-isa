@@ -110,6 +110,8 @@ exports.loginWithGoogle = catchAsync(async (req, res, next) => {
     let user = await prisma.user.findFirst({
         where: {
             email,
+            google: true,
+            active: true,
         },
     });
 
@@ -117,6 +119,7 @@ exports.loginWithGoogle = catchAsync(async (req, res, next) => {
         user = await prisma.user.create({
             data: {
                 email,
+                google: true,
                 name,
                 photo,
                 status: "Verifed",
@@ -236,6 +239,7 @@ exports.login = catchAsync(async (req, res, next) => {
             where: {
                 email: email,
                 active: true,
+                google: false,
             },
         });
     } else {
@@ -243,6 +247,7 @@ exports.login = catchAsync(async (req, res, next) => {
             where: {
                 phoneNumber: email,
                 active: true,
+                google: false,
             },
         });
     }
