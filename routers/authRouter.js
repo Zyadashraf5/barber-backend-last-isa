@@ -9,10 +9,10 @@ router.route("/register").post(upload.single("photo"), authController.register);
 router.route("/verify").post(authController.verifyOTP);
 router.route("/forgetPassword").post(authController.forgetPassword);
 router.route("/resetPassword").post(authController.resetPassword);
+router.route("/google").get(authController.loginWithGoogle);
 router.use(authController.isLoggedIn);
 router.route("/me").get(authController.getMe).post(authController.editMe);
 router.route("/deleteme").get(authController.deleteMe);
-router.route("/google").get(authController.loginWithGoogle);
 router.route("/changePassword").post(authController.changePassword);
 router
     .route("/coupon")
