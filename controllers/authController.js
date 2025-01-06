@@ -106,7 +106,18 @@ exports.loginWithGoogle = catchAsync(async (req, res, next) => {
 
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture: photo } = payload;
-
+    user = await prisma.user.findFirst({
+        where: {
+            email,
+            google: false,
+            active: true,
+        },
+    });
+    if (user) {
+        return next(
+            new AppError("this email is registered using email & password", 400)
+        );
+    }
     let user = await prisma.user.findFirst({
         where: {
             email,
