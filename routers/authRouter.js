@@ -12,7 +12,7 @@ router.route("/resetPassword").post(authController.resetPassword);
 router.use(authController.isLoggedIn);
 router.route("/me").get(authController.getMe).post(authController.editMe);
 router.route("/deleteme").get(authController.deleteMe);
-router.route("/google").get(authController.loginGoogle);
+router.route("/google").get(authController.loginWithGoogle);
 router.route("/changePassword").post(authController.changePassword);
 router
     .route("/coupon")
