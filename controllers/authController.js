@@ -6,6 +6,7 @@ const { PrismaClient } = require("@prisma/client");
 const { promisify } = require("util");
 const crypto = require("crypto");
 const sendEmail = require("../utils/email");
+const { OAuth2Client } = require("google-auth-library");
 // const accountSid =process.env.TWILIO_ACCOUNT_SID;
 // const authToken = process.env.TWILIO_AUTH_TOKEN ;
 // const client =  require('twilio')(accountSid, authToken);
@@ -125,7 +126,49 @@ exports.loginGoogle = catchAsync(async (req, res, next) => {
         token,
     });
 });
+const client = new OAuth2Client(
+    "161281286827-5ngq423os3ensuhiort43qvks4156n44.apps.googleusercontent.com"
+);
 
+exports.loginWithGoogle = catchAsync(async (req, res, next) => {
+    const { idToken } = req.query;
+
+    if (!idToken) {
+        return next(new AppError("ID token is required!", 400));
+    }
+
+    const ticket = await client.verifyIdToken({
+        idToken,
+        audience:
+            "161281286827-5ngq423os3ensuhiort43qvks4156n44.apps.googleusercontent.com",
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, email, name, picture: photo } = payload;
+
+    let user = await prisma.user.findFirst({
+        where: {
+            email,
+        },
+    });
+
+    if (!user) {
+        user = await prisma.user.create({
+            data: {
+                email,
+                name,
+                photo,
+                status: "Verifed",
+            },
+        });
+    }
+
+    const token = signToken(user.id);
+    res.status(200).json({
+        user,
+        token,
+    });
+});
 exports.editMe = catchAsync(async (req, res, next) => {
     const user = await prisma.user.update({
         where: {
