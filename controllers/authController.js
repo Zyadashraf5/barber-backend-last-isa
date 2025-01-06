@@ -86,14 +86,54 @@ exports.getMe = catchAsync(async (req, res, next) => {
         user,
     });
 });
+exports.loginGoogle = catchAsync(async (req, res, next) => {
+    console.log(req.params, req.query);
+    res.status(200).json({
+        message: "success",
+    });
+    return;
+    var user;
+    if (isNaN(email)) {
+        user = await prisma.user.findFirst({
+            where: {
+                email: email,
+                active: true,
+            },
+        });
+    } else {
+        user = await prisma.user.findFirst({
+            where: {
+                phoneNumber: email,
+                active: true,
+            },
+        });
+    }
+
+    if (!user) {
+        user = await prisma.user.create({
+            data: {
+                photo: photo,
+                email: email,
+                name: name,
+                status: "Verifed",
+            },
+        });
+    }
+    const token = signToken(user.id);
+    res.status(200).json({
+        user,
+        token,
+    });
+});
+
 exports.editMe = catchAsync(async (req, res, next) => {
     const user = await prisma.user.update({
         where: {
             id: req.user.id,
         },
-        data:{
-            ...req.body
-        }
+        data: {
+            ...req.body,
+        },
     });
     res.status(200).json({
         user,

@@ -1,0 +1,10 @@
+{
+    "web": {
+        "client_id": "803141368467-vg1oe95fuibjt7vk6aipi7nn43ththd2.apps.googleusercontent.com",
+        "project_id": "salon-446813",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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"
+    }
+}
