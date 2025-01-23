@@ -67,12 +67,12 @@ const generateEmailTemplate = ({ name, message }) => `
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-        host: "smtp.titan.email", // Gmail SMTP server
-        port: 465, // Secure SMTP port
+        host: process.env.HOST, // Gmail SMTP server
+        port: process.env.PORT, // Secure SMTP port
         secure: true,
         auth: {
-            user: "sender@salonat-kw.com",
-            pass: "LOVEyou16@",
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
         },
     });
 
@@ -83,7 +83,7 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: "sender@salonat-kw.com",
+        from: "Salonat <sender@salonat-kw.com>",
         to: options.email,
         subject: options.subject,
         html: htmlContent, // Use the HTML template
