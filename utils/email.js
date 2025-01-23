@@ -67,11 +67,11 @@ const generateEmailTemplate = ({ name, message }) => `
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-        host: "smtp.hostinger.com", // Gmail SMTP server
-        port: 587, // Secure SMTP port
+        host: "smtp.titan.email", // Gmail SMTP server
+        port: 465, // Secure SMTP port
         secure: true,
         auth: {
-            user: "support@yavcode.com",
+            user: "sender@salonat-kw.com",
             pass: "LOVEyou16@",
         },
     });
@@ -83,7 +83,7 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: "Salon <support@yavcode.com>",
+        from: "Salon <salon.barber11@gmail.com>",
         to: options.email,
         subject: options.subject,
         html: htmlContent, // Use the HTML template
