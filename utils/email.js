@@ -83,7 +83,7 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: "Salon <salon.barber11@gmail.com>",
+        from: "sender@salonat-kw.com",
         to: options.email,
         subject: options.subject,
         html: htmlContent, // Use the HTML template
