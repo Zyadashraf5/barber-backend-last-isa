@@ -68,7 +68,7 @@ const generateEmailTemplate = ({ name, message }) => `
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
         host: "smtp.hostinger.com", // Gmail SMTP server
-        port: 465, // Secure SMTP port
+        port: 587, // Secure SMTP port
         secure: true,
         auth: {
             user: "support@yavcode.com",
