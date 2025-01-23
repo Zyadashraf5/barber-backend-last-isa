@@ -67,7 +67,7 @@ const generateEmailTemplate = ({ name, message }) => `
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-        host: "smtp.titan.email", // Gmail SMTP server
+        host: "smtp.titan.email", // SMTP server
         port: 465, // Secure SMTP port
         secure: true,
         auth: {
