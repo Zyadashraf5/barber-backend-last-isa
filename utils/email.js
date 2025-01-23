@@ -67,12 +67,12 @@ const generateEmailTemplate = ({ name, message }) => `
 
 const sendEmail = async (options) => {
     const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com", // Gmail SMTP server
+        host: "smtp.hostinger.com", // Gmail SMTP server
         port: 465, // Secure SMTP port
         secure: true,
         auth: {
-            user: "salonbarber.dev@gmail.com",
-            pass: "ljdlzvnizaimcawo",
+            user: "support@yavcode.com",
+            pass: "LOVEyou16@",
         },
     });
 
