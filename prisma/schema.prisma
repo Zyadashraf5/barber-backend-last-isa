@@ -187,4 +187,5 @@ enum Payment_Type {
 enum gender {
   Male
   Female
+  prefer_not_to_say
 }
